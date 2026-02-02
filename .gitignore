@@ -1,3 +1,7 @@
 venv/
 __pycache__/
-*.pkltrain.csv
+*.pkl
+*.csv
+generate_dataset.py
+train.py
+predict.py
