@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pickle
 
@@ -7,9 +8,9 @@ vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
 
 st.set_page_config(page_title="Toxicity Detection Model", layout="centered")
 
-st.title("Toxicity Detection Model")
+st.title("Toxicity Detection Model - Two User Chat")
 
-# Clear chat button
+# Clear chat
 if st.button("Clear Chat"):
     st.session_state.messages = []
 
@@ -18,24 +19,22 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 # Display previous messages
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+for msg in st.session_state.messages:
+    with st.chat_message(msg["sender"]):
+        st.markdown(f"**{msg['name']}:** {msg['text']}")
+        st.markdown(f"Toxicity Level: **{msg['label']}**")
+
+# Select user
+sender = st.radio("Select User:", ["User A", "User B"])
 
 # Chat input
-user_input = st.chat_input("Enter a comment...")
+user_input = st.chat_input("Type a message...")
 
 if user_input:
 
-    # Show user message
-    st.session_state.messages.append({"role": "user", "content": user_input})
-    with st.chat_message("user"):
-        st.markdown(user_input)
-
-    # Preprocess
+    # Convert text to lowercase
     processed = user_input.lower()
     vector = vectorizer.transform([processed])
-
     prediction = model.predict(vector)[0]
 
     labels = {
@@ -45,13 +44,18 @@ if user_input:
         3: "Severe"
     }
 
-    response = f"Predicted Level: **{labels[prediction]}**"
+    label = labels[prediction]
 
-    st.session_state.messages.append({"role": "assistant", "content": response})
+    # Determine sender role (for chat style)
+    role = "user" if sender == "User A" else "assistant"
 
-    with st.chat_message("assistant"):
-        st.markdown(response)
+    # Save message
+    st.session_state.messages.append({
+        "sender": role,
+        "name": sender,
+        "text": user_input,
+        "label": label
+    })
 
-# Sidebar info
-st.sidebar.title("Session Statistics")
-st.sidebar.write("Total Messages:", len(st.session_state.messages) // 2)
+    # Rerun to display
+    st.rerun()
