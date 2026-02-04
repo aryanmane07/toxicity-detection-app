@@ -5,3 +5,4 @@ __pycache__/
 generate_dataset.py
 train.py
 predict.py
+.DS_Store

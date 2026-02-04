@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Toxicity Detection Model</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3a8a, #0f172a);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            letter-spacing: 1px;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 40px;
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 14px;
+        }
+
+        .top-bar a {
+            color: #ff6b6b;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .chat-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chat-container {
+            width: 65%;
+            height: 70vh;
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 15px;
+            border-radius: 12px;
+            max-width: 70%;
+            position: relative;
+            font-size: 14px;
+        }
+
+        .userA {
+            background-color: #2563eb;
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .userB {
+            background-color: #374151;
+            color: white;
+            margin-right: auto;
+        }
+
+        .severity {
+            display: inline-block;
+            margin-top: 5px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .Non-toxic {
+            background-color: #22c55e;
+            color: white;
+        }
+
+        .Mild {
+            background-color: #facc15;
+            color: black;
+        }
+
+        .Moderate {
+            background-color: #f97316;
+            color: white;
+        }
+
+        .Severe {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .input-area {
+            width: 65%;
+            margin: 20px auto;
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-area input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+        }
+
+        .input-area button {
+            padding: 12px 25px;
+            border-radius: 8px;
+            border: none;
+            background-color: #2563eb;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .input-area button:hover {
+            background-color: #1d4ed8;
+        }
+
+        .footer {
+            text-align: center;
+            color: #cbd5e1;
+            font-size: 12px;
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    Toxicity Detection Model
+</div>
+
+<div class="top-bar">
+    <div>
+        Logged in as <strong>{{ current_user }}</strong>
+    </div>
+    <div>
+        Total Messages: <strong>{{ total }}</strong> |
+        <a href="/clear">Clear Chat</a>
+    </div>
+</div>
+
+<div class="chat-wrapper">
+    <div class="chat-container">
+
+        {% for msg in messages %}
+        <div class="message {% if msg.sender == current_user %}userA{% else %}userB{% endif %}">
+                <strong>{{ msg.sender }}</strong><br>
+                {{ msg.text }}<br>
+                <span class="severity {{ msg.severity }}">{{ msg.severity }}</span>
+            </div>
+        {% endfor %}
+
+    </div>
+</div>
+
+<form method="POST" class="input-area">
+    <input type="text" name="message" placeholder="Type your message..." required>
+    <button type="submit">Send</button>
+</form>
+
+<div class="footer">
+    Real-time Toxicity Classification using LinearSVC
+</div>
+
+</body>
+</html>
