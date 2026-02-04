@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+    <h2>Real-Time Toxicity Chat</h2>
+    <p>Logged in as: {{ username }}</p>
+    <a href="/logout">Logout</a>
+
+    <div id="chat-box"></div>
+
+    <input id="message" placeholder="Type message">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        var socket = io();
+
+        function sendMessage() {
+            var msg = document.getElementById("message").value;
+            socket.emit("send_message", {message: msg});
+            document.getElementById("message").value = "";
+        }
+
+        socket.on("receive_message", function(data) {
+            var chat = document.getElementById("chat-box");
+            chat.innerHTML += "<p><b>" + data.username + 
+                " (" + data.timestamp + ")</b>: " +
+                data.text + " → " + data.severity + "</p>";
+        });
+    </script>
+</body>
+</html>

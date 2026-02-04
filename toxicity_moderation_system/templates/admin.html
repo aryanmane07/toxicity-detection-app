@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Panel</title>
+</head>
+<body>
+    <h2>Admin Panel</h2>
+    <a href="/chat">Back to Chat</a>
+
+    <table border="1">
+        <tr>
+            <th>User</th>
+            <th>Message</th>
+            <th>Severity</th>
+            <th>Time</th>
+        </tr>
+
+        {% for msg in messages %}
+        <tr>
+            <td>{{ msg[1] }}</td>
+            <td>{{ msg[2] }}</td>
+            <td>{{ msg[3] }}</td>
+            <td>{{ msg[4] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
