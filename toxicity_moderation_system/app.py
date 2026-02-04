@@ -7,15 +7,15 @@ import os
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
 
-socketio = SocketIO(app)
+# IMPORTANT: specify async_mode
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")
 
 # Load ML model
 model = pickle.load(open("model.pkl", "rb"))
 vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
 
-# In-memory message storage (for now)
+# In-memory storage
 messages = []
-
 
 # ==============================
 # ROUTES
@@ -47,43 +47,23 @@ def admin():
     return render_template("admin.html", messages=messages)
 
 
-@app.route("/logout")
-def logout():
-    session.pop("username", None)
-    return redirect("/login")
-
-
 # ==============================
-# WEBSOCKET
+# SOCKET EVENTS
 # ==============================
 
 @socketio.on("send_message")
 def handle_message(data):
-    if "username" not in session:
-        return
+    text = data["text"]
+    username = data["username"]
 
-    text = data["message"]
-    username = session["username"]
-
-    # Predict toxicity
-    vector = vectorizer.transform([text])
-    prediction = model.predict(vector)[0]
-
-    if prediction == 0:
-        severity = "Non-Toxic"
-    elif prediction == 1:
-        severity = "Mild"
-    elif prediction == 2:
-        severity = "Moderate"
-    else:
-        severity = "Severe"
+    prediction = model.predict(vectorizer.transform([text]))[0]
 
     timestamp = datetime.now().strftime("%H:%M")
 
     message_data = {
         "username": username,
         "text": text,
-        "severity": severity,
+        "severity": str(prediction),
         "timestamp": timestamp
     }
 
@@ -97,4 +77,4 @@ def handle_message(data):
 # ==============================
 
 if __name__ == "__main__":
-    socketio.run(app, host="0.0.0.0", port=10000)
+    socketio.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
